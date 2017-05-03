@@ -3,9 +3,9 @@
 # This script creates the hello_ucosii application in this directory.
 
 
-BSP_DIR=D:/Dev/vhdl/dev/testProject_bsp/
+BSP_DIR=D:/Dev/vhdl/dev/testNIOS/audioVisualisator_bsp/
 QUARTUS_PROJECT_DIR=D:/Dev/vhdl/program/University_Program/Computer_Systems/DE2-115/DE2-115_Media_Computer/verilog/
-NIOS2_APP_GEN_ARGS="--elf-name testProject.elf --set OBJDUMP_INCLUDE_SOURCE 1 --src-files hello_ucosii.c"
+NIOS2_APP_GEN_ARGS="--elf-name audioVisualisator.elf --set OBJDUMP_INCLUDE_SOURCE 1 --src-files hello_ucosii.c"
 
 
 # First, check to see if $SOPC_KIT_NIOS2 environmental variable is set.
