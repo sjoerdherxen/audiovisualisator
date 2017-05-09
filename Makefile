@@ -144,6 +144,7 @@ ELF := audioVisualisator.elf
 # Paths to C, C++, and assembly source files.
 C_SRCS += hello_ucosii.c
 C_SRCS += src/Display.c
+C_SRCS += src/Audio.c
 CXX_SRCS :=
 ASM_SRCS :=
 

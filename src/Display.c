@@ -28,12 +28,10 @@ void DisplayInit(){
     colors[7] = 0b0000000000111111;
     colors[8] = 0b0111100000011111;
     colors[9] = 0b1111100000001111;
-
 }
 
 void DisplayValues(int* values)
 {
-	//DisplayBlock(0, 0, 1,5, 0b1111100000000000);
 	int i;
 	for(i = 0; i < 10; i++){
 		int y;
@@ -47,15 +45,6 @@ void DisplayValues(int* values)
 			}
 		}
 		prevValues[i] = values[i];
-		/*for(y = 1; y <= 8; y++){
-
-
-			if(y <= values[i]){
-				DisplayBlock(i*32 + 2, (8-y)*32 - 18, 28, 28, 0b1111100000000000);
-			} else {
-				DisplayBlock(i*32 + 2, (8-y)*32 - 18, 28, 28, 0b1111111111111111);
-			}
-		}*/
 	}
 }
 

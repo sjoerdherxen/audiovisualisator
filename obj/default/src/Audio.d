@@ -1,4 +1,4 @@
-obj/default/hello_ucosii.o: hello_ucosii.c \
+obj/default/src/Audio.o: src/Audio.c src/Audio.h \
  d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\hal\inc\includes.h \
  d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\hal\inc\os_cpu.h \
  d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\hal\inc\sys/alt_irq.h \
@@ -13,12 +13,9 @@ obj/default/hello_ucosii.o: hello_ucosii.c \
  d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\hal\inc\sys\alt_llist.h \
  d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\hal\inc\priv\alt_alarm.h \
  d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\ucosii\inc\ucos_ii.h \
- d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\hal\inc\os_cpu.h \
- src/display.h src/Audio.h \
- d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\drivers\inc\altera_up_avalon_audio.h \
- d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\hal\inc\sys\alt_dev.h \
- d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\hal\inc\sys\alt_llist.h \
- d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\hal\inc\priv\alt_dev_llist.h
+ d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\hal\inc\os_cpu.h
+
+src/Audio.h:
 
 d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\hal\inc\includes.h:
 
@@ -49,15 +46,3 @@ d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\hal\inc\priv\alt_alarm.h:
 d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\ucosii\inc\ucos_ii.h:
 
 d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\hal\inc\os_cpu.h:
-
-src/display.h:
-
-src/Audio.h:
-
-d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\drivers\inc\altera_up_avalon_audio.h:
-
-d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\hal\inc\sys\alt_dev.h:
-
-d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\hal\inc\sys\alt_llist.h:
-
-d:\dev\vhdl\dev\testnios\audiovisualisator_bsp\hal\inc\priv\alt_dev_llist.h:
