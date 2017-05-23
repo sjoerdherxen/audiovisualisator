@@ -1,19 +1,25 @@
 #include "Audio.h"
 
+
 alt_up_audio_dev *audio_device;				// Audio device
 kiss_fft_cfg mycfg;							// FFT config
+unsigned int fifospace;
 
 unsigned int srate;
 unsigned int ssize;
 double frequency_step;
 
+kiss_fft_scalar *inr;
+kiss_fft_cpx *outr;
 float *amplitudes;
 
 size_t buffer_index;
 size_t i;
 
-void AudioInit(unsigned int sample_rate, unsigned int sample_size){
+
+int AudioInit(unsigned int sample_rate, unsigned int sample_size){
 	
+	//printf("AudioInit\n");
 	//Open the Altera Audio
 	audio_device = alt_up_audio_open_dev("/dev/Audio_Subsystem_Audio");
 
@@ -26,14 +32,14 @@ void AudioInit(unsigned int sample_rate, unsigned int sample_size){
 	
 	srate = sample_rate;
 	ssize = sample_size;				// Must be a power of 2
-	frequency_step = sampling_rate / sample_size;
+	frequency_step = sample_rate / sample_size;
 
 }
 
-void FftInit(){
-	
+int FftInit(){
+	//printf("FftInit\n");
 	//Initialize a FFT (or IFFT) algorithm's cfg/state buffer.
-	mycfg = kiss_fftr_alloc(sample_size, 0, NULL, NULL);
+	mycfg = kiss_fftr_alloc(ssize, 0, NULL, NULL);
 
 	if (mycfg == NULL)
 	{
@@ -43,19 +49,23 @@ void FftInit(){
 		printf("Successful: Initialized KISS Fast Fourier Transform\n");
 	
 	// Buffer for the calculated amplitudes.
-	amplitudes = calloc(sample_size / 2 + 1, sizeof(float));
-	
-	kiss_fft_scalar inr[sample_size];			//Inputbuffer for Real FFT
-	kiss_fft_cpx outr[sample_size / 2 + 1];		//Outputbuffer for Real FFT
-	
+	amplitudes = calloc(ssize / 2 + 1, sizeof(float));
+
+	//kiss_fft_scalar inr[ssize];			//Inputbuffer for Real FFT
+	//kiss_fft_cpx outr[ssize / 2 + 1];		//Outputbuffer for Real FFT
+
+	inr = (float*)malloc(sizeof(kiss_fft_scalar) * ssize);
+	outr = (float*)malloc(sizeof(kiss_fft_cpx) * (ssize / 2 + 1));
+
 }
 
 void AudioSample(){
 	
+	//printf("AudioSample\n");
 	volatile int *audio_ptr = (int*) 0x10003040;
 	buffer_index = 0;
 	
-	while (buffer_index < sample_size)
+	while (buffer_index < ssize)
 	{
 		//Read the audio port fifospace register
 		fifospace = *(audio_ptr + 1);
@@ -64,7 +74,7 @@ void AudioSample(){
 		if ((fifospace & 0x000000FF)> 96)
 		{
 			// Store data until the audio-in FIFO is empty or the memory buffer is full
-			while ((fifospace & 0x000000FF) && (buffer_index < sample_size))
+			while ((fifospace & 0x000000FF) && (buffer_index < ssize))
 			{
 				// Read right audio buffer, assuming it is practically the same as the left
 				inr[buffer_index] = *(audio_ptr + 3);
@@ -78,22 +88,22 @@ void AudioSample(){
 	}	
 }
 
-int DoFft(){
+float* DoFft(){
 	
+	//printf("DoFft\n");
 	kiss_fftr(mycfg, inr, outr);
 	
-	for(i=0; i<sample_size;i++){
+	for(i=0; i<ssize;i++){
 
 		// Using only half the buffer since it is a mirror of the other half
 		// This has to do with Nyquist theorem.
-		if (i < sample_size / 2 + 1)
+		if (i < ssize / 2 + 1)
 		{
-			amplitudes[i] = sqrt((outr[i].r * outr[i].r) + (outr[i].i * outr[i].i));
-			
+			amplitudes[i] = sqrt((outr[i].r * outr[i].r) + (outr[i].i * outr[i].i)) / pow(2,32);
 		}
 	}
 	
-	return *amplitudes;
+	return amplitudes;
 }
 
 

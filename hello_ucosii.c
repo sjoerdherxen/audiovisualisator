@@ -3,96 +3,94 @@
 #include "includes.h"
 #include "src/display.h"
 #include "src/Audio.h"
-#include <altera_up_avalon_audio.h>
 
-/* Definition of Task Stacks */
-#define   TASK_STACKSIZE       2048
-OS_STK task1_stk[TASK_STACKSIZE];
+#define SAMPLE_RATE 48000
+#define SAMPLE_SIZE 256
 
-/* Definition of Task Priorities */
 
-#define TASK1_PRIORITY      1
+// Definition of Task Stacks
+//##########################
+#define TASK_STACKSIZE 2048
 
-void task2(void* pdata) {
-	unsigned int buffer[128];
-	alt_up_audio_dev* a;
-	a = alt_up_audio_open_dev("/dev/Audio_Subsystem_Audio");
-	if (a == NULL) {
-		printf("fuck!!\nMe dinge is kapot dat is bale??\nFIX DIE SHIT");
-		return;
-	}
-	alt_up_audio_enable_read_interrupt(a);
+OS_STK audioStack[TASK_STACKSIZE];
+OS_STK videoStack[TASK_STACKSIZE];
 
-	volatile int *audioSettings = 0x10003040;
-	*audioSettings = 5;
-	*audioSettings = 1;
-	//printf("audio%x\n", *audioSettings); // 0011 0000 0100 0000
-	while (1) {
 
-		*audioSettings = 5;
-		*audioSettings = 1;
-		int wordCount = 0;
+// Definition of Task Priorities
+//##############################
+#define AUDIO_TASK_PRIORITY      1
+#define VIDEO_TASK_PRIORITY      2
 
-		//wordCount = alt_up_audio_read_fifo_avail(a, 1);
-		while (!(*audioSettings & 1 << 8)) {
-			wordCount = alt_up_audio_read_fifo_avail(a, 1);
+void *QueueStack[5];
+OS_EVENT *Queue;
 
-			//printf("nop%d\n", wordCount);
-		}
-		//alt_up_audio_record_r(a, buffer, 128-wordCount);
+void audioTask(void* pdata) {
 
-		int i;
-		//printf("count: %d\n", 128-wordCount);
-		for (i = 0; i < 128-wordCount; i++) {
-			if (audioSettings[i + 3])
-				printf("%d\n", audioSettings[i + 3]);
-		}
-		OSTimeDlyHMSM(0, 0, 31, 1);
+	AudioInit(SAMPLE_RATE, SAMPLE_SIZE);
+	FftInit();
+	while (1)
+	{
+		printf("## Audiotask\n");
+		AudioSample();
+
+		// Put the returned pointer from DoFft() in a queue so that videoTask can use it.
+		OSQPost(Queue, DoFft());
+
+		OSTimeDlyHMSM(0, 0, 0, 200);
 	}
 }
 
 /* Prints "Hello World" and sleeps for three seconds */
-void task1(void* pdata) {
+void videoTask(void* pdata) {
+
 	DisplayInit();
-	AudioInit();
+
+	int i;
+	INT8U *err =0;
+	int values[10];
+
+
 	while (1) {
-		AudioSample();
-		int* values;
-		values = malloc(sizeof(int) * 10);
-		int sample = 2;
-		if (sample > 0xff000000) {
-			values[1] = 0;
-			values[0] = 1;
-		} else if (sample < 0xffff) {
-			values[1] = 1;
-			values[0] = 0;
-		} else {
-			values[1] = 1;
-			values[0] = 1;
+		printf("## Videotask\n");
+		float* volume = (float*)OSQPend(Queue, 0, &err);
+
+		// Initialize values array to 0
+		for(i=0; i<10; i++)
+		{
+			values[i] = 0;
 		}
-		//values[1] = rand()%8;
-		values[2] = rand() % 2;
-		values[3] = rand() % 3;
-		values[4] = rand() % 4;
-		values[5] = rand() % 5;
-		values[6] = rand() % 6;
-		values[7] = rand() % 7;
-		values[8] = rand() % 1;
-		values[9] = rand() % 1;
+
+		for(i=0; i < SAMPLE_SIZE; i++)
+		{
+			if((int)volume[i]> values[i / ((SAMPLE_SIZE / 2) /10)])
+			{
+				values[i / ((SAMPLE_SIZE / 2) /10)] = (int)volume[i];
+			}
+		}
+
 		DisplayValues(values);
-		free(values);
-		OSTimeDlyHMSM(0, 0, 2, 0);
+
+		OSTimeDlyHMSM(0, 0, 0, 100);
 	}
 }
 
 int main(void) {
 
-	OSTaskCreateExt(task2,
-	NULL, (void *) &task1_stk[TASK_STACKSIZE - 1],
-	TASK1_PRIORITY,
-	TASK1_PRIORITY, task1_stk,
-	TASK_STACKSIZE,
-	NULL, 0);
+	Queue = OSQCreate(&QueueStack[0], 5);
+
+	OSTaskCreateExt(audioTask,
+			NULL, (void *) &audioStack[TASK_STACKSIZE - 1],
+			AUDIO_TASK_PRIORITY,
+			AUDIO_TASK_PRIORITY, audioStack,
+			TASK_STACKSIZE,
+			NULL, 0);
+
+	OSTaskCreateExt(videoTask,
+			NULL, (void *) &videoStack[TASK_STACKSIZE - 1],
+			VIDEO_TASK_PRIORITY,
+			VIDEO_TASK_PRIORITY, videoStack,
+			TASK_STACKSIZE,
+			NULL, 0);
 
 	OSStart();
 	return 0;

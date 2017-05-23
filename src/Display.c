@@ -34,6 +34,11 @@ void DisplayValues(int* values)
 {
 	int i;
 	for(i = 0; i < 10; i++){
+		if(values[i]>7){
+			printf("%x\t", values[i]);
+			values[i]=7;
+			printf("reset to 7 \n");
+		}
 		int y;
 		if(prevValues[i] > values[i]){
 			for(y = values[i]; y <= prevValues[i]; y++){
