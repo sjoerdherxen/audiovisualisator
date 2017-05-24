@@ -1,17 +1,14 @@
 #include "Audio.h"
 
-
 alt_up_audio_dev *audio_device;				// Audio device
+unsigned int fifospace;						// Audio FIFO buffer
+
 kiss_fft_cfg mycfg;							// FFT config
-unsigned int fifospace;
+kiss_fft_scalar *inr;						// FFT inputbuffer
+kiss_fft_cpx *outr;							// FFT outputbuffer
+float *amplitudes;							// Calculated amplitude buffer
 
-unsigned int srate;
 unsigned int ssize;
-double frequency_step;
-
-kiss_fft_scalar *inr;
-kiss_fft_cpx *outr;
-float *amplitudes;
 
 size_t buffer_index;
 size_t i;
@@ -30,9 +27,7 @@ int AudioInit(unsigned int sample_rate, unsigned int sample_size){
 	} else
 		printf("Successful: Opened Audio device\n");
 	
-	srate = sample_rate;
 	ssize = sample_size;				// Must be a power of 2
-	frequency_step = sample_rate / sample_size;
 
 }
 

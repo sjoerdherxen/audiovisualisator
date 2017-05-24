@@ -50,13 +50,16 @@ void videoTask(void* pdata) {
 	int values[10];
 	float scaler[10];
 	int scale[10];
+	int nyquistSize;
 	
 	scaler[9] = SAMPLE_SIZE;
 	scale[9] = SAMPLE_SIZE;
-	for(i = 8; i >= 0; i--){
+	for(i = 8; i >= 0; i--)
+	{
 		scaler[i] = scaler[i+1] / 1.7;
 		scale[i] = scaler[i];
 	}
+	nyquistSize = SAMPLE_SIZE / 2;
 	
 	while (1) {
 		printf("## Videotask\n");
@@ -69,7 +72,7 @@ void videoTask(void* pdata) {
 		}
 
 		int index = 0;
-		for(i=0; i < SAMPLE_SIZE; i++)
+		for(i=0; i < nyquistSize; i++)
 		{
 			if(i >= scale[index]){
 				index++;	
