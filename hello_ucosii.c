@@ -48,8 +48,16 @@ void videoTask(void* pdata) {
 	int i;
 	INT8U *err =0;
 	int values[10];
-	int scale[] = {9, 20, 35, 50, 70, 100, 140, 180, 220,  257};
-
+	float scaler[10];
+	int scale[10];
+	
+	scaler[9] = SAMPLE_SIZE;
+	scale[9] = SAMPLE_SIZE;
+	for(i = 8; i >= 0; i--){
+		scaler[i] = scaler[i+1] / 1.7;
+		scale[i] = scaler[i];
+	}
+	
 	while (1) {
 		printf("## Videotask\n");
 		float* volume = (float*)OSQPend(Queue, 0, &err);
