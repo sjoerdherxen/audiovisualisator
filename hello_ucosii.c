@@ -48,15 +48,15 @@ void videoTask(void* pdata) {
 	int i;
 	INT8U *err =0;
 	int values[10];
-	float scaler[10];
+	float scaler[11];
 	int scale[10];
 	int nyquistSize;
 	
-	scaler[9] = SAMPLE_SIZE;
+	scaler[10] = SAMPLE_SIZE;
 	scale[9] = SAMPLE_SIZE;
-	for(i = 8; i >= 0; i--)
+	for(i = 9; i >= 0; i--)
 	{
-		scaler[i] = scaler[i+1] / 1.7;
+		scaler[i] = scaler[i+1] / 1.5;
 		scale[i] = scaler[i];
 	}
 	nyquistSize = SAMPLE_SIZE / 2;
