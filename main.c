@@ -51,6 +51,7 @@ void videoTask(void* pdata) {
 	float scaler[11];
 	int scale[10];
 	int nyquistSize;
+	int freqstep;
 	
 	scaler[10] = SAMPLE_SIZE;
 	scale[9] = SAMPLE_SIZE;
@@ -60,6 +61,7 @@ void videoTask(void* pdata) {
 		scale[i] = scaler[i];
 	}
 	nyquistSize = SAMPLE_SIZE / 2;
+	freqstep = SAMPLE_RATE / SAMPLE_SIZE;
 	
 	while (1) {
 		//printf("## Videotask\n");
@@ -72,16 +74,27 @@ void videoTask(void* pdata) {
 		}
 
 		int index = 0;
+		int max =0;
 		for(i=0; i < nyquistSize; i++)
 		{
-			if(i >= scale[index])
+			if((int)(log(i+1)*freqstep)/100 > index)
 			{
-				index++;	
+				max=0;
+				index++;
 			}
-			if((int)volume[i]> values[index])
+			if((int)(volume[i]) > max )
 			{
-				values[index] = (int)volume[i];
+				values[(int)(log(i+1)*freqstep)/91] = (int)volume[i];
+				max = (int)volume[i];
 			}
+//			if(i >= scale[index])
+//			{
+//				index++;
+//			}
+//			if((int)volume[i]> values[index])
+//			{
+//				values[index] = (int)volume[i];
+//			}
 		}
 
 		DisplayValues(values);
