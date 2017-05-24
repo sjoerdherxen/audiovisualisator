@@ -48,7 +48,7 @@ void videoTask(void* pdata) {
 	int i;
 	INT8U *err =0;
 	int values[10];
-
+	int scale[] = {9, 20, 35, 50, 70, 100, 140, 180, 220,  257};
 
 	while (1) {
 		printf("## Videotask\n");
@@ -60,11 +60,15 @@ void videoTask(void* pdata) {
 			values[i] = 0;
 		}
 
+		int index = 0;
 		for(i=0; i < SAMPLE_SIZE; i++)
 		{
-			if((int)volume[i]> values[i / ((SAMPLE_SIZE / 2) /10)])
+			if(i >= scale[index]){
+				index++;	
+			}
+			if((int)volume[i]> values[index)])
 			{
-				values[i / ((SAMPLE_SIZE / 2) /10)] = (int)volume[i];
+				values[index] = (int)volume[i];
 			}
 		}
 
