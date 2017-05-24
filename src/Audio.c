@@ -14,8 +14,8 @@ size_t buffer_index;
 size_t i;
 
 
-int AudioInit(unsigned int sample_rate, unsigned int sample_size){
-	
+void AudioInit(unsigned int sample_rate, unsigned int sample_size)
+{
 	//printf("AudioInit\n");
 	//Open the Altera Audio
 	audio_device = alt_up_audio_open_dev("/dev/Audio_Subsystem_Audio");
@@ -23,7 +23,7 @@ int AudioInit(unsigned int sample_rate, unsigned int sample_size){
 	if (audio_device == NULL)
 	{
 		printf("Error: could not open Audio device\n");
-		return -1;
+		return;
 	} else
 		printf("Successful: Opened Audio device\n");
 	
@@ -31,7 +31,8 @@ int AudioInit(unsigned int sample_rate, unsigned int sample_size){
 
 }
 
-int FftInit(){
+void FftInit()
+{
 	//printf("FftInit\n");
 	//Initialize a FFT (or IFFT) algorithm's cfg/state buffer.
 	mycfg = kiss_fftr_alloc(ssize, 0, NULL, NULL);
@@ -39,7 +40,7 @@ int FftInit(){
 	if (mycfg == NULL)
 	{
 		printf("Error: could not initialize KISS Fast Fourier Transform\n");
-		return -1;
+		return;
 	} else
 		printf("Successful: Initialized KISS Fast Fourier Transform\n");
 	
@@ -54,8 +55,8 @@ int FftInit(){
 
 }
 
-void AudioSample(){
-	
+void AudioSample()
+{
 	//printf("AudioSample\n");
 	volatile int *audio_ptr = (int*) 0x10003040;
 	buffer_index = 0;
@@ -83,17 +84,18 @@ void AudioSample(){
 	}	
 }
 
-float* DoFft(){
-	
+float* DoFft()
+{
 	//printf("DoFft\n");
 	kiss_fftr(mycfg, inr, outr);
 	
-	for(i=0; i<ssize;i++){
-
+	for(i=0; i<ssize;i++)
+	{
 		// Using only half the buffer since it is a mirror of the other half
 		// This has to do with Nyquist theorem.
 		if (i < ssize / 2 + 1)
 		{
+			// Calculate amplitude from FFT data. This is the sqrt( realComponent^2 + complexComponent
 			amplitudes[i] = sqrt((outr[i].r * outr[i].r) + (outr[i].i * outr[i].i)) / pow(2,32);
 		}
 	}

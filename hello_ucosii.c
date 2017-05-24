@@ -30,13 +30,13 @@ void audioTask(void* pdata) {
 	FftInit();
 	while (1)
 	{
-		printf("## Audiotask\n");
+		//printf("## Audiotask\n");
 		AudioSample();
 
 		// Put the returned pointer from DoFft() in a queue so that videoTask can use it.
 		OSQPost(Queue, DoFft());
 
-		OSTimeDlyHMSM(0, 0, 0, 200);
+		OSTimeDlyHMSM(0, 0, 0, 75);
 	}
 }
 
@@ -62,7 +62,7 @@ void videoTask(void* pdata) {
 	nyquistSize = SAMPLE_SIZE / 2;
 	
 	while (1) {
-		printf("## Videotask\n");
+		//printf("## Videotask\n");
 		float* volume = (float*)OSQPend(Queue, 0, &err);
 
 		// Initialize values array to 0
@@ -74,10 +74,11 @@ void videoTask(void* pdata) {
 		int index = 0;
 		for(i=0; i < nyquistSize; i++)
 		{
-			if(i >= scale[index]){
+			if(i >= scale[index])
+			{
 				index++;	
 			}
-			if((int)volume[i]> values[index)])
+			if((int)volume[i]> values[index])
 			{
 				values[index] = (int)volume[i];
 			}
@@ -85,7 +86,7 @@ void videoTask(void* pdata) {
 
 		DisplayValues(values);
 
-		OSTimeDlyHMSM(0, 0, 0, 100);
+		OSTimeDlyHMSM(0, 0, 0, 25);
 	}
 }
 
