@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "includes.h"
 
 void DisplayInit();
