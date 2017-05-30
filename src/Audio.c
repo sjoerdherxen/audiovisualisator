@@ -8,7 +8,7 @@ kiss_fft_scalar *inr;						// FFT inputbuffer
 kiss_fft_cpx *outr;							// FFT outputbuffer
 float *amplitudes;							// Calculated amplitude buffer
 
-unsigned int ssize;
+unsigned int ssize;							// Must be a power of 2 so that FFT can truly be fast.
 
 size_t buffer_index;
 size_t i;
@@ -95,7 +95,7 @@ float* DoFft()
 		// This has to do with Nyquist theorem.
 		if (i < ssize / 2 + 1)
 		{
-			// Calculate amplitude from FFT data. This is the sqrt( realComponent^2 + complexComponent
+			// Calculate amplitude from FFT data. This is the sqrt( realComponent^2 + complexComponent^2)
 			amplitudes[i] = sqrt((outr[i].r * outr[i].r) + (outr[i].i * outr[i].i)) / pow(2,32);
 		}
 	}

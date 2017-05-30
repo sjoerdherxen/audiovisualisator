@@ -24,6 +24,7 @@ OS_STK videoStack[TASK_STACKSIZE];
 void *QueueStack[5];
 OS_EVENT *Queue;
 
+// Sample audio, perform FFT and return amplitudes
 void audioTask(void* pdata) {
 
 	AudioInit(SAMPLE_RATE, SAMPLE_SIZE);
@@ -40,7 +41,7 @@ void audioTask(void* pdata) {
 	}
 }
 
-/* Prints "Hello World" and sleeps for three seconds */
+// Display the appropriate squares on the screen
 void videoTask(void* pdata) {
 
 	DisplayInit();
@@ -105,8 +106,11 @@ void videoTask(void* pdata) {
 
 int main(void) {
 
+	// Create message queue for communication between the audiotask en videotask
 	Queue = OSQCreate(&QueueStack[0], 5);
 
+
+	// Create the individual tasks
 	OSTaskCreateExt(audioTask,
 			NULL, (void *) &audioStack[TASK_STACKSIZE - 1],
 			AUDIO_TASK_PRIORITY,
@@ -121,6 +125,7 @@ int main(void) {
 			TASK_STACKSIZE,
 			NULL, 0);
 
+	// Start multitasking
 	OSStart();
 	return 0;
 }
