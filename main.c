@@ -31,9 +31,8 @@ void audioTask(void* pdata) {
 	FftInit();
 	while (1)
 	{
-		//printf("## Audiotask\n");
 		AudioSample();
-
+		
 		// Put the returned pointer from DoFft() in a queue so that videoTask can use it.
 		OSQPost(Queue, DoFft());
 
@@ -54,6 +53,7 @@ void videoTask(void* pdata) {
 	int nyquistSize;
 	int freqstep;
 	
+	// zet de verschaling van kolommen op het scherm op logoritmisch.
 	scaler[10] = SAMPLE_SIZE;
 	scale[9] = SAMPLE_SIZE;
 	for(i = 9; i >= 0; i--)
@@ -65,7 +65,6 @@ void videoTask(void* pdata) {
 	freqstep = SAMPLE_RATE / SAMPLE_SIZE;
 	
 	while (1) {
-		//printf("## Videotask\n");
 		float* volume = (float*)OSQPend(Queue, 0, &err);
 
 		// Initialize values array to 0
@@ -78,6 +77,7 @@ void videoTask(void* pdata) {
 		int max =0;
 		for(i=0; i < nyquistSize; i++)
 		{
+			// zoek de hoogste waarde in de huidige kolom
 			if((int)(log(i+1)*freqstep)/100 > index)
 			{
 				max=0;
@@ -98,6 +98,7 @@ void videoTask(void* pdata) {
 //			}
 		}
 
+		// zet de nieuwe waardes op het scherm
 		DisplayValues(values);
 
 		OSTimeDlyHMSM(0, 0, 0, 25);
